@@ -110,5 +110,10 @@ export interface Profile {
     sp_clist?: Buffer;
     dp_mlist?: Buffer;
     dp_clist?: Buffer;
-  }
+  },
+
+  music_memo?: {
+    music_id: number;
+    play_style: number;
+  }[];
 }

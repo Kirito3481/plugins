@@ -186,7 +186,7 @@ export const get: EPR = async (info, data, send) => {
         }, {
           slider: K.ARRAY('s32', profile.lightning.setting.effectSlider),
           light: K.ARRAY('bool', profile.lightning.setting.light),
-          conventration: K.ITEM('bool', profile.lightning.setting.concentration)
+          concentration: K.ITEM('bool', profile.lightning.setting.concentration)
         })
       }
     },
@@ -195,7 +195,17 @@ export const get: EPR = async (info, data, send) => {
       g: grade.gradeList.map(g => K.ARRAY('u8', g))
     }),
 
-    rlist: {}
+    rlist: {},
+
+    ...profile.music_memo && {
+      music_memo: {
+        music: profile.music_memo.map((m, i) => K.ATTR({
+          index: String(i),
+          music_id: String(m.music_id),
+          play_style: String(m.play_style)
+        }))
+      }
+    }
   });
 };
 
@@ -401,6 +411,20 @@ export const save: EPR = async (info, data, send) => {
       profile.favorite.sp_clist = favorite.buffer('sp_clist');
       profile.favorite.dp_mlist = favorite.buffer('dp_mlist');
       profile.favorite.dp_clist = favorite.buffer('dp_clist');
+    }
+
+    // extra_favorite
+    // playlist
+
+    const musicMemo = $(data).element('music_memo');
+    if (musicMemo) {
+      if (!profile.music_memo) profile.music_memo = [];
+
+      const music = musicMemo.elements('music');
+      profile.music_memo = music.map(m => ({
+        music_id: parseInt(m.attr().music_id),
+        play_style: parseInt(m.attr().play_style)
+      }));
     }
 
     console.dir(profile, { depth: null });
