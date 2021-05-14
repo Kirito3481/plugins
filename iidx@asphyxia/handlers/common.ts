@@ -2,6 +2,8 @@ import {ShopConvention, ShopData} from '../models/shopData';
 
 export const common: EPR = (info, data, send) => {
   return send.object(K.ATTR({ expire: '3' }, {
+    movie_agreement: K.ATTR({ version: '1' }),
+    license: {},
     file_recovery: K.ATTR({ url: 'http://localhost:8083/' }),
     movie_upload: K.ATTR({ url: 'http://localhost:8083/' }),
     // cm_movie_info: {},
@@ -119,14 +121,14 @@ export const getConvention: EPR = async (info, data, send) => {
   const convention = await DB.FindOne<ShopConvention>({ collection: 'shopconvention' });
 
   return send.object(K.ATTR({
-    music_0: String(convention.music0 ?? 2000),
-    music_1: String(convention.music1 ?? 1008),
-    music_2: String(convention.music2 ?? 4005),
-    music_3: String(convention.music3 ?? 1000),
-    start_time: String(convention.startTime ?? 1601510400),
-    end_time: String(convention.endTime ?? 1601510400)
+    music_0: String(convention.music0 | 2000),
+    music_1: String(convention.music1 | 1008),
+    music_2: String(convention.music2 | 4005),
+    music_3: String(convention.music3 | 1000),
+    start_time: String(convention.startTime || 1601510400),
+    end_time: String(convention.endTime || 1601510400)
   }, {
-    valid: K.ITEM('bool', convention.valid ?? false)
+    valid: K.ITEM('bool', convention.valid || false)
   }));
 };
 

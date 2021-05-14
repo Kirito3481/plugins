@@ -93,17 +93,17 @@ export const get: EPR = async (info, data, send) => {
     d_tsujigiri_disp: '0'
   };
 
-  const pcdata = profile.pcdata;
-
   if (!profile.grade) profile.grade = {
     sgid: '-1',
     dgid: '-1',
     gradeList: []
   };
 
-  const grade = profile.grade;
+  console.dir(profile.achievements.trophy);
 
-  return send.object({
+  return send.pugFile('templates/28_profile.pug', { ...profile, iidxIdstr: IIDXID_TO_STR(profile.iidxId) });
+
+  /*return send.object({
     pcdata: K.ATTR({
       id: String(profile.iidxId),
       idstr: IIDXID_TO_STR(profile.iidxId),
@@ -206,7 +206,7 @@ export const get: EPR = async (info, data, send) => {
         }))
       }
     }
-  });
+  });*/
 };
 
 export const save: EPR = async (info, data, send) => {
@@ -390,17 +390,17 @@ export const save: EPR = async (info, data, send) => {
     if (secret) {
       if (!profile.secret) profile.secret = {};
 
-      profile.secret.flg1 = secret.bigints('flg1');
-      profile.secret.flg2 = secret.bigints('flg2');
-      profile.secret.flg3 = secret.bigints('flg3');
-      profile.secret.flg4 = secret.bigints('flg4');
+      profile.secret.flg1 = secret.numbers('flg1');
+      profile.secret.flg2 = secret.numbers('flg2');
+      profile.secret.flg3 = secret.numbers('flg3');
+      profile.secret.flg4 = secret.numbers('flg4');
     }
 
     const leggendaria = $(data).element('leggendaria');
     if (leggendaria) {
       if (!profile.leggendaria) profile.leggendaria = {};
 
-      profile.leggendaria.flg1 = leggendaria.bigints('flg1');
+      profile.leggendaria.flg1 = leggendaria.numbers('flg1');
     }
 
     const favorite = $(data).element('favorite');
@@ -431,11 +431,11 @@ export const save: EPR = async (info, data, send) => {
     if (qproSecret) {
       if (!profile.qpro_secret) profile.qpro_secret = {};
 
-      profile.qpro_secret.head = qproSecret.bigints('head');
-      profile.qpro_secret.hair = qproSecret.bigints('hair');
-      profile.qpro_secret.face = qproSecret.bigints('face');
-      profile.qpro_secret.body = qproSecret.bigints('body');
-      profile.qpro_secret.hand = qproSecret.bigints('hand');
+      profile.qpro_secret.head = qproSecret.bigints('head').map(v => Number(v));
+      profile.qpro_secret.hair = qproSecret.bigints('hair').map(v => Number(v));
+      profile.qpro_secret.face = qproSecret.bigints('face').map(v => Number(v));
+      profile.qpro_secret.body = qproSecret.bigints('body').map(v => Number(v));
+      profile.qpro_secret.hand = qproSecret.bigints('hand').map(v => Number(v));
     }
 
     const qproEquip = $(data).element('qpro_equip');
@@ -484,7 +484,7 @@ export const save: EPR = async (info, data, send) => {
       profile.step_28.sp_clear_mission_level = sp_clear_mission_level;
       profile.step_28.dp_clear_mission_level = dp_clear_mission_level;
       profile.step_28.sp_dj_mission_clear = sp_dj_mission_clear;
-      profile.step_28.dp_dj_mission_clear = sp_dj_mission_clear;
+      profile.step_28.dp_dj_mission_clear = dp_dj_mission_clear;
       profile.step_28.sp_clear_mission_clear = sp_clear_mission_clear;
       profile.step_28.dp_clear_mission_clear = dp_clear_mission_clear;
       profile.step_28.sp_mplay = sp_mplay;
@@ -498,6 +498,8 @@ export const save: EPR = async (info, data, send) => {
       const { pack_id, pack_flg, play_pack, pack_comp, last_weekly, weekly_num, visit_flg } = achievements.attr();
       if (!profile.achievements) profile.achievements = {};
 
+      console.log();
+
       profile.achievements.pack_id = pack_id;
       profile.achievements.pack_flg = pack_flg;
       profile.achievements.play_pack = play_pack;
@@ -505,7 +507,7 @@ export const save: EPR = async (info, data, send) => {
       profile.achievements.last_weekly = last_weekly;
       profile.achievements.weekly_num = weekly_num;
       profile.achievements.visit_flg = visit_flg;
-      profile.achievements.trophy = achievements.bigints('trophy');
+      profile.achievements.trophy = achievements.bigints('trophy').map(v => Number(v));
     }
 
     // expert_point
@@ -557,7 +559,8 @@ export const save: EPR = async (info, data, send) => {
       const { add_orb, present_orb, reward_orb } = orbData.attr();
       if (!profile.orb_data) profile.orb_data = {};
 
-      profile.orb_data.orb = IncrementInt(profile.orb_data.orb, parseInt(add_orb) + parseInt(present_orb) + parseInt(reward_orb));
+      profile.orb_data.orb = IncrementInt(profile.orb_data.orb, parseInt(add_orb));
+      profile.orb_data.present_orb = IncrementInt(profile.orb_data.present_orb, parseInt(present_orb));
       if (orbData.bool('use_vip_pass')) {
         profile.orb_data.orb = 0;
       }
@@ -568,7 +571,7 @@ export const save: EPR = async (info, data, send) => {
       const { consume_num } = payPerUseItem.attr();
       if (!profile.pay_per_use_item) profile.pay_per_use_item = {};
 
-      profile.pay_per_use_item.consume_num = parseInt(consume_num);
+      profile.pay_per_use_item.consume_num = IncrementInt(profile.pay_per_use_item.consume_num, parseInt(consume_num));
 
       if (!profile.pay_per_use_item.consume_details) profile.pay_per_use_item.consume_details = [];
       const detail = payPerUseItem.elements('consume_detail');
@@ -583,7 +586,7 @@ export const save: EPR = async (info, data, send) => {
       const { consume_num } = presentPayPerUseItem.attr();
       if (!profile.present_pay_per_use_item) profile.present_pay_per_use_item = {};
 
-      profile.present_pay_per_use_item.consume_num = parseInt(consume_num);
+      profile.present_pay_per_use_item.consume_num = IncrementInt(profile.present_pay_per_use_item.consume_num, parseInt(consume_num));
 
       if (!profile.present_pay_per_use_item.consume_details) profile.present_pay_per_use_item.consume_details = [];
       const detail = presentPayPerUseItem.elements('present_consume_detail');
@@ -613,11 +616,174 @@ export const save: EPR = async (info, data, send) => {
 
     // arena_data
     // arena_log
+    // music_history
+    // qr_window
+    // tsujigiri
+    // tsujigiri_hidden_chara
+    // play_log
 
+    // weekly_result
 
-    console.dir(profile, { depth: null });
+    const skinCustomizeFlg = $(data).element('skin_customize_flg');
+    if (skinCustomizeFlg) {
+      const { skin_frame_flg, skin_bgm_flg } = skinCustomizeFlg.attr();
+      if (!profile.skin_customize_flg) profile.skin_customize_flg = {};
 
-    // await DB.Update<Profile>(profile.__refid, { collection: 'profile', iidxId: profile.iidxId }, profile);
+      profile.skin_customize_flg.skin_frame_flg = skin_frame_flg;
+      profile.skin_customize_flg.skin_bgm_flg = skin_bgm_flg;
+    }
+
+    const news = $(data).element('news');
+    if (news) {
+      if (!profile.news) profile.news = {};
+
+      profile.news.last_read_time = news.numbers('last_read_time');
+    }
+
+    const languageSetting = $(data).element('language_setting');
+    if (languageSetting) {
+      const { language } = languageSetting.attr();
+      if (!profile.language_setting) profile.language_setting = {};
+
+      profile.language_setting.language = language;
+    }
+
+    const movieAgreement = $(data).element('movie_agreement');
+    if (movieAgreement) {
+      const { agreement_version } = movieAgreement.attr();
+      if (!profile.movie_agreement) profile.movie_agreement = {};
+
+      profile.movie_agreement.agreement_version = agreement_version;
+    }
+
+    const movieSetting = $(data).element('movie_setting');
+    if (movieSetting) {
+      if (!profile.movie_setting) profile.movie_setting = {};
+
+      profile.movie_setting.hide_name = movieSetting.bool('hide_name');
+    }
+
+    const extraBossEvent = $(data).element('extra_boss_event');
+    if (extraBossEvent) {
+      const {
+        key_orb,
+        boss_orb_0,
+        boss_orb_1,
+        boss_orb_2,
+        boss_orb_3,
+        boss_orb_4,
+        boss_orb_5,
+        boss_orb_6,
+        boss_orb_7
+      } = extraBossEvent.attr();
+      if (!profile.extra_boss_event) profile.extra_boss_event = {};
+
+      profile.extra_boss_event.key_orb = key_orb;
+      profile.extra_boss_event.boss_orb_0 = boss_orb_0;
+      profile.extra_boss_event.boss_orb_1 = boss_orb_1;
+      profile.extra_boss_event.boss_orb_2 = boss_orb_2;
+      profile.extra_boss_event.boss_orb_3 = boss_orb_3;
+      profile.extra_boss_event.boss_orb_4 = boss_orb_4;
+      profile.extra_boss_event.boss_orb_5 = boss_orb_5;
+      profile.extra_boss_event.boss_orb_6 = boss_orb_6;
+      profile.extra_boss_event.boss_orb_7 = boss_orb_7;
+
+      const onemore = extraBossEvent.element('onemore');
+      if (onemore) {
+        const {
+          gauge,
+          challenge_num_0_n,
+          challenge_num_0_h,
+          challenge_num_0_a,
+          challenge_num_1_n,
+          challenge_num_1_h,
+          challenge_num_1_a,
+          challenge_num_2_n,
+          challenge_num_2_h,
+          challenge_num_2_a
+        } = onemore.attr();
+        if (!profile.extra_boss_event.onemore) profile.extra_boss_event.onemore = {};
+
+        profile.extra_boss_event.onemore.gauge = gauge;
+        profile.extra_boss_event.onemore.challenge_num_0_n = challenge_num_0_n;
+        profile.extra_boss_event.onemore.challenge_num_0_h = challenge_num_0_h;
+        profile.extra_boss_event.onemore.challenge_num_0_a = challenge_num_0_a;
+        profile.extra_boss_event.onemore.challenge_num_1_n = challenge_num_1_n;
+        profile.extra_boss_event.onemore.challenge_num_1_h = challenge_num_1_h;
+        profile.extra_boss_event.onemore.challenge_num_1_a = challenge_num_1_a;
+        profile.extra_boss_event.onemore.challenge_num_2_n = challenge_num_2_n;
+        profile.extra_boss_event.onemore.challenge_num_2_h = challenge_num_2_h;
+        profile.extra_boss_event.onemore.challenge_num_2_a = challenge_num_2_a;
+        profile.extra_boss_event.onemore.defeat_flg_0_n = onemore.bool('defeat_flg_0_n');
+        profile.extra_boss_event.onemore.defeat_flg_0_h = onemore.bool('defeat_flg_0_h');
+        profile.extra_boss_event.onemore.defeat_flg_0_a = onemore.bool('defeat_flg_0_a');
+        profile.extra_boss_event.onemore.defeat_flg_1_n = onemore.bool('defeat_flg_1_n');
+        profile.extra_boss_event.onemore.defeat_flg_1_h = onemore.bool('defeat_flg_1_h');
+        profile.extra_boss_event.onemore.defeat_flg_1_a = onemore.bool('defeat_flg_1_a');
+        profile.extra_boss_event.onemore.defeat_flg_2_n = onemore.bool('defeat_flg_2_n');
+        profile.extra_boss_event.onemore.defeat_flg_2_h = onemore.bool('defeat_flg_2_h');
+        profile.extra_boss_event.onemore.defeat_flg_2_a = onemore.bool('defeat_flg_2_a');
+      }
+    }
+
+    const event1 = $(data).element('event_1');
+    if (event1) {
+      const { story_prog, last_select_area_id, failed_num } = event1.attr();
+      if (!profile.event_1_28) profile.event_1_28 = {};
+
+      profile.event_1_28.event_play_num = IncrementInt(profile.event_1_28.event_play_num);
+      profile.event_1_28.story_prog = parseInt(story_prog);
+      profile.event_1_28.last_select_area_id = parseInt(last_select_area_id);
+      profile.event_1_28.failed_num = parseInt(failed_num);
+
+      const areaData = event1.elements('area_data');
+      if (areaData) {
+        if (!profile.event_1_28.area_data) profile.event_1_28.area_data = [];
+
+        areaData.map(area => {
+          const {
+            area_id,
+            play_num,
+            recipe_prog0,
+            recipe_prog1,
+            recipe_prog2,
+            recipe_prog3,
+            recipe_prog4,
+            operation_num,
+            operation_prog,
+            last_select_recipe,
+            area_prog
+          } = area.attr();
+          const isComplete = area.bool('is_complete');
+
+          profile.event_1_28.area_data[parseInt(area_id)] = {
+            area_id: parseInt(area_id),
+            play_num: parseInt(play_num),
+            recipe_prog0: parseInt(recipe_prog0),
+            recipe_prog1: parseInt(recipe_prog1),
+            recipe_prog2: parseInt(recipe_prog2),
+            recipe_prog3: parseInt(recipe_prog3),
+            recipe_prog4: parseInt(recipe_prog4),
+            operation_num: parseInt(operation_num),
+            operation_prog: parseInt(operation_prog),
+            last_select_recipe: parseInt(last_select_recipe),
+            area_prog: parseInt(area_prog),
+            is_complete: isComplete
+          };
+        });
+      }
+    }
+
+    const valkyrieLinkageData = $(data).element('valkyrie_linkage_data');
+    if (valkyrieLinkageData) {
+      if (!profile.valkyrie_linkage_data) profile.valkyrie_linkage_data = {};
+
+      profile.valkyrie_linkage_data.progress = valkyrieLinkageData.bool('is_complete');
+    }
+
+    // console.dir(profile, { depth: null });
+
+    await DB.Update<Profile>(profile.__refid, { collection: 'profile', iidxId: profile.iidxId }, profile);
 
     return send.success();
   }

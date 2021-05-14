@@ -11,7 +11,7 @@ export const IIDXID_TO_STR = (iidxId: number) => {
 };
 
 export const IncrementInt = (cur: string | number, i: number | string = 1) => {
-  if (typeof cur === 'string' || typeof cur === 'undefined') cur = parseInt(cur ?? '0');
-  if (typeof i === 'string' || typeof i === 'undefined') i = parseInt(i ?? '0');
+  if (typeof cur === 'string' || typeof cur === 'undefined') cur = parseInt(cur || '0');
+  if (typeof i === 'string' || typeof i === 'undefined') i = parseInt(i || '0');
   return cur + i;
 };

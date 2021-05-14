@@ -95,14 +95,14 @@ export interface Profile {
   },
 
   secret?: {
-    flg1?: bigint[];
-    flg2?: bigint[];
-    flg3?: bigint[];
-    flg4?: bigint[];
+    flg1?: number[];
+    flg2?: number[];
+    flg3?: number[];
+    flg4?: number[];
   },
 
   leggendaria?: {
-    flg1?: bigint[];
+    flg1?: number[];
   },
 
   favorite?: {
@@ -118,11 +118,11 @@ export interface Profile {
   }[];
 
   qpro_secret?: {
-    head?: bigint[];
-    hair?: bigint[];
-    face?: bigint[];
-    body?: bigint[];
-    hand?: bigint[];
+    head?: number[];
+    hair?: number[];
+    face?: number[];
+    body?: number[];
+    hand?: number[];
   };
 
   qpro?: {
@@ -141,7 +141,7 @@ export interface Profile {
     last_weekly?: string;
     weekly_num?: string;
     visit_flg?: string;
-    trophy?: bigint[];
+    trophy?: number[];
   };
 
   dj_rank?: {
@@ -175,6 +175,7 @@ export interface Profile {
 
   orb_data?: {
     orb?: number;
+    present_orb?: number;
   };
 
   pay_per_use_item?: {
@@ -202,6 +203,65 @@ export interface Profile {
     skip_flg?: string;
   };
 
+  skin_customize_flg?: {
+    skin_frame_flg?: string;
+    skin_bgm_flg?: string;
+  };
+
+  news?: {
+    last_read_time?: number[];
+  };
+
+  language_setting?: {
+    language?: string;
+  };
+
+  movie_agreement?: {
+    agreement_version?: string;
+  };
+
+  movie_setting?: {
+    hide_name?: boolean;
+  };
+
+  extra_boss_event?: {
+    key_orb?: string;
+    boss_orb_0?: string;
+    boss_orb_1?: string;
+    boss_orb_2?: string;
+    boss_orb_3?: string;
+    boss_orb_4?: string;
+    boss_orb_5?: string;
+    boss_orb_6?: string;
+    boss_orb_7?: string;
+
+    onemore?: {
+      gauge?: string;
+      challenge_num_0_n?: string;
+      challenge_num_0_h?: string;
+      challenge_num_0_a?: string;
+      challenge_num_1_n?: string;
+      challenge_num_1_h?: string;
+      challenge_num_1_a?: string;
+      challenge_num_2_n?: string;
+      challenge_num_2_h?: string;
+      challenge_num_2_a?: string;
+      defeat_flg_0_n?: boolean;
+      defeat_flg_0_h?: boolean;
+      defeat_flg_0_a?: boolean;
+      defeat_flg_1_n?: boolean;
+      defeat_flg_1_h?: boolean;
+      defeat_flg_1_a?: boolean;
+      defeat_flg_2_n?: boolean;
+      defeat_flg_2_h?: boolean;
+      defeat_flg_2_a?: boolean;
+    }
+  };
+
+  valkyrie_linkage_data?: {
+    progress?: boolean;
+  }
+
   step_28?: {
     enemy_damage?: string;
     progress?: string;
@@ -221,5 +281,27 @@ export interface Profile {
     dp_mplay?: string;
     tips_read_list?: string;
     is_track_ticket?: boolean;
+  };
+
+  event_1_28?: {
+    event_play_num?: number;
+    story_prog?: number;
+    last_select_area_id?: number;
+    failed_num?: number;
+
+    area_data?: {
+      area_id?: number;
+      play_num?: number;
+      recipe_prog0?: number;
+      recipe_prog1?: number;
+      recipe_prog2?: number;
+      recipe_prog3?: number;
+      recipe_prog4?: number;
+      operation_num?: number;
+      operation_prog?: number;
+      last_select_recipe?: number;
+      area_prog?: number;
+      is_complete?: boolean;
+    }[];
   };
 }
