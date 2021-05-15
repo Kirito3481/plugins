@@ -1,6 +1,21 @@
 /// <reference types="node" />
 /// <reference types="lodash" />
 
+/**
+ * Version string of Asphyxia CORE, for example "v1.19"
+ */
+declare const CORE_VERSION: string;
+
+/**
+ * Major version of Asphyxia CORE, for version <code>v1.19</code>, this number is 1.
+ */
+declare const CORE_VERSION_MAJOR: number;
+
+/**
+ * Minor version of Asphyxia CORE, for version <code>v1.19</code>, this number is 19.
+ */
+declare const CORE_VERSION_MINOR: number;
+
 declare type KNumberType =
   | 's8'
   | 'u8'
@@ -109,7 +124,7 @@ declare interface EamuseSendOption {
 
   /**
    * Encode response with specified encoding
-   * Default: 'SHIFT_JIS'
+   * @default {KEncoding.SHIFT_JIS}
    */
   encoding?: KEncoding;
 
@@ -219,6 +234,35 @@ declare interface EamuseSend {
 }
 
 /**
+ * Details of a data file
+ */
+declare interface FileOption {
+  /**
+   * The accept attribute of the file input element.
+   *
+   * See {@link https://www.w3schools.com/tags/att_input_accept.asp}.
+   */
+  accept?: string;
+
+  /**
+   * Provide a description for the entry.
+   */
+  desc?: string;
+
+  /**
+   * Provide a name to display in WebUI. If not provided, WebUI will use filename as the label.
+   */
+  name?: string;
+
+  /**
+   * Whether the file is required for the plugin to work, defaults to false.
+   *
+   * Note that this only provides visual hint for the file in WebUI.
+   */
+  required?: boolean;
+}
+
+/**
  * Helper type for typing your custom route.
  */
 declare type EamusePluginRoute = (
@@ -306,6 +350,15 @@ declare namespace R {
     event: string,
     callback: (data: any) => void | Promise<void>
   ): void;
+
+  /**
+   * Register a datafile upload entry.
+   * @param path a path (with filename) where the uploaded file will be saved to.
+   * @param options {FileOption}
+   * @constructor
+   * @returns void
+   */
+  function DataFile(path: string, options?: FileOption): void;
 }
 
 /**
@@ -316,10 +369,16 @@ declare class KDataReader {
    * Wrapped javascript object
    */
   public obj: any;
+
+  /**
+   *
+   * @param obj
+   * @returns KDataReader
+   */
   constructor(obj: any);
 
   /**
-   * Get attrubutes for a tag
+   * Get attributes for a tag
    *
    * Example:
    * ```xml
@@ -330,7 +389,7 @@ declare class KDataReader {
    *   </tag>
    * </data>
    * ```
-   * ```javascript
+   *```javascript
    * const data = {
    *   tag: K.ATTR({ status: "1" }, {
    *     inner: [
@@ -347,6 +406,8 @@ declare class KDataReader {
    * $(data).element("tag").attr().status // "1"
    * $(data).attr("tag.inner.0").__type // "s32"
    * ```
+   * @param path
+   * @returns KAttrMap
    */
   attr(path?: string): KAttrMap;
 
@@ -644,48 +705,56 @@ declare class KDataReader {
  * Helper for reading xml-like formatted data.
  */
 declare function $(data: any): KDataReader;
+
 declare namespace $ {
   function ATTR(data: any, path?: string): KAttrMap;
+
   function BIGINT(data: any, path: string, def?: bigint): bigint;
+
   function BIGINTS(data: any, path: string, def?: bigint[]): bigint[];
+
   function BOOL(data: any, path: string): boolean;
+
   function BUFFER(data: any, path: string, def?: Buffer): Buffer;
+
   function CONTENT(data: any, path: string, def?: any): any;
+
   function ELEMENT(data: any, path: string, def?: any): any;
+
   function ELEMENTS(data: any, path: string, def?: any): any;
+
   function NUMBER(data: any, path: string, def?: number): number;
+
   function NUMBERS(data: any, path: string, def?: number[]): number[];
+
   function STR(data: any, path: string, def?: string): string;
 }
 
 /** @ignore */
-declare interface KITEM<
-  S extends
-    | KNumberType
-    | KBigIntType
-    | KNumberGroupType
-    | KBigIntGroupType
-    | 'str'
-    | 'bool'
-    | 'bin'
-    | 'ip4'
-> {
+declare interface KITEM<S extends | KNumberType
+  | KBigIntType
+  | KNumberGroupType
+  | KBigIntGroupType
+  | 'str'
+  | 'bool'
+  | 'bin'
+  | 'ip4'> {
   '@attr': {
     __type: S;
   };
   '@content': S extends 'str'
     ? string
     : S extends 'bin'
-    ? Buffer
-    : S extends KNumberType | 'ip4' | 'bool'
-    ? [number]
-    : S extends KBigIntType
-    ? [bigint]
-    : S extends KNumberGroupType
-    ? number[]
-    : S extends KBigIntGroupType
-    ? bigint[]
-    : unknown;
+      ? Buffer
+      : S extends KNumberType | 'ip4' | 'bool'
+        ? [number]
+        : S extends KBigIntType
+          ? [bigint]
+          : S extends KNumberGroupType
+            ? number[]
+            : S extends KBigIntGroupType
+              ? bigint[]
+              : unknown;
 }
 
 /** @ignore */
@@ -697,8 +766,8 @@ declare interface KARRAY<S extends KNumberType | KBigIntType> {
   '@content': S extends KNumberType
     ? number[]
     : S extends KBigIntType
-    ? bigint[]
-    : unknown;
+      ? bigint[]
+      : unknown;
 }
 
 /** @ignore */
@@ -903,6 +972,14 @@ declare namespace IO {
    * If a file descriptor is provided, the underlying file will _not_ be closed automatically.
    */
   function ReadFile(path: string): Promise<Buffer>;
+
+  /**
+   * Synchronously tests whether or not the given path exists by checking with the file system.
+   * @param path A path to a file or directory. If a URL is provided, it must use the file: protocol. URL support is experimental.
+   * @constructor
+   * @returns boolean
+   */
+  function Exists(path: string): boolean;
 }
 
 /**
@@ -931,6 +1008,24 @@ declare namespace U {
    * @param key
    */
   function GetConfig(key: string): any;
+
+  /**
+   * Decode a string from a specified encoding
+   * @param buffer
+   * @param encoding
+   * @constructor
+   * @returns string
+   */
+  function DecodeString(buffer: Buffer, encoding: KEncoding): string;
+
+  /**
+   * Encode a string into a specified encoding
+   * @param str string to encode
+   * @param encoding {KEncoding}
+   * @constructor
+   * @returns Buffer
+   */
+  function EncodeString(str: string, encoding: KEncoding): Buffer;
 }
 
 /** @ignore */
@@ -940,23 +1035,23 @@ type ProfileDoc<T> = { _id?: string; __refid?: string } & T;
 /** @ignore */
 type Query<T> = {
   [P in keyof T]?:
-    | T[P]
-    | (T[P] extends Array<infer E>
-        ? { $elemMatch: Query<E[]> } | { $size: number }
-        : T[P] extends number | string
-        ?
-            | { $lt: T[P] }
-            | { $lte: T[P] }
-            | { $gt: T[P] }
-            | { $gte: T[P] }
-            | { $in: T[P][] }
-            | { $ne: any }
-            | { $nin: any[] }
-            | { $exists: boolean }
-            | { $regex: RegExp }
-        : T[P] extends object
-        ? Query<T[P]>
-        : T[P]);
+  | T[P]
+  | (T[P] extends Array<infer E>
+  ? { $elemMatch: Query<E[]> } | { $size: number }
+  : T[P] extends number | string
+    ?
+    | { $lt: T[P] }
+    | { $lte: T[P] }
+    | { $gt: T[P] }
+    | { $gte: T[P] }
+    | { $in: T[P][] }
+    | { $ne: any }
+    | { $nin: any[] }
+    | { $exists: boolean }
+    | { $regex: RegExp }
+    : T[P] extends object
+      ? Query<T[P]>
+      : T[P]);
 } & {
   $or?: Query<T>[];
   $and?: Query<T>[];
@@ -977,44 +1072,36 @@ type Operators =
   | '$nin'
   | '$regex';
 /** @ignore */
-type PickyOperator<T, C, F> = Pick<
-  {
-    [P in keyof T]?: T[P] extends C ? F : Omit<T[P], Operators>;
-  },
+type PickyOperator<T, C, F> = Pick<{
+  [P in keyof T]?: T[P] extends C ? F : Omit<T[P], Operators>;
+},
   {
     [P in keyof T]: T[P] extends C ? P : never;
-  }[keyof T]
->;
+  }[keyof T]>;
 /** @ignore */
-type ArrayPushOperator<T> = Pick<
-  {
+type ArrayPushOperator<T> =
+  Pick<{
     [P in keyof T]?: T[P] extends Array<infer E>
       ? E | { $each?: E[]; $slice?: number }
       : never;
   },
-  { [P in keyof T]: T[P] extends Array<any> ? P : never }[keyof T]
-> & { [path: string]: any | { $each?: any[]; $slice?: number } };
+    { [P in keyof T]: T[P] extends Array<any> ? P : never }[keyof T]>
+  & { [path: string]: any | { $each?: any[]; $slice?: number } };
 /** @ignore */
-type ArraySetOperator<T> = Pick<
-  {
-    [P in keyof T]?: T[P] extends Array<infer E> ? E | { $each: E[] } : never;
-  },
-  { [P in keyof T]: T[P] extends Array<any> ? P : never }[keyof T]
-> & { [path: string]: any | { $each: any[] } };
+type ArraySetOperator<T> = Pick<{
+  [P in keyof T]?: T[P] extends Array<infer E> ? E | { $each: E[] } : never;
+},
+  { [P in keyof T]: T[P] extends Array<any> ? P : never }[keyof T]> & { [path: string]: any | { $each: any[] } };
 /** @ignore */
-type ArrayInOperator<T> = Pick<
-  {
-    [P in keyof T]?: T[P] extends Array<infer E> ? E | { $in: E[] } : never;
-  },
-  { [P in keyof T]: T[P] extends Array<any> ? P : never }[keyof T]
-> & { [path: string]: any | { $in: any[] } };
+type ArrayInOperator<T> = Pick<{
+  [P in keyof T]?: T[P] extends Array<infer E> ? E | { $in: E[] } : never;
+},
+  { [P in keyof T]: T[P] extends Array<any> ? P : never }[keyof T]> & { [path: string]: any | { $in: any[] } };
 /** @ignore */
-type ArrayPopOperator<T> = Pick<
-  {
-    [P in keyof T]?: T[P] extends Array<any> ? -1 | 1 : never;
-  },
-  { [P in keyof T]: T[P] extends Array<any> ? P : never }[keyof T]
-> & { [path: string]: -1 | 1 };
+type ArrayPopOperator<T> = Pick<{
+  [P in keyof T]?: T[P] extends Array<any> ? -1 | 1 : never;
+},
+  { [P in keyof T]: T[P] extends Array<any> ? P : never }[keyof T]> & { [path: string]: -1 | 1 };
 /** @ignore */
 type Update<T> = Partial<T> & {
   $unset?: PickyOperator<T, number, true> & { [path: string]: true };
