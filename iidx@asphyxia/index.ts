@@ -4,13 +4,14 @@ import {
   shop_sendescapepackageinfo,
 } from './handlers/common';
 import * as pc from './handlers/pc';
+import * as music from './handlers/music';
 
 export const register = () => {
   R.GameCode('LDJ');
 
   R.Route('IIDX27shop.getname', shop_getname);
   R.Route('IIDX27shop.savename', true);
-  R.Route('IIDX27shop.sendinfo', true);
+  R.Route('IIDX27shop.sentinfo', true);
   R.Route('IIDX27shop.sendescapepackageinfo', shop_sendescapepackageinfo);
 
   R.Route('IIDX27gameSystem.systemInfo', gameSystem_systemInfo);
@@ -19,6 +20,11 @@ export const register = () => {
   R.Route('IIDX27pc.playend', true);
   R.Route('IIDX27pc.delete', true);
   R.Route('IIDX27pc.oldget', pc.oldget);
+  R.Route('IIDX27pc.reg', pc.reg);
+  R.Route('IIDX27pc.get', pc.get);
+  R.Route('IIDX27pc.visit', pc.visit);
+
+  R.Route('IIDX27music.getrank', music.getrank);
 
   R.Unhandled((req, data, send) => {
     console.dir(data, { depth: null });
