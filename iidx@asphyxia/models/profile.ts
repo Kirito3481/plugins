@@ -1,4 +1,3 @@
-import { Version } from '../utils/constants';
 import { templatesFromVersion } from '../utils/templatesImport';
 import { ValidatedMap } from '../utils/validatedMap';
 

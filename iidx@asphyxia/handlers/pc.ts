@@ -18,7 +18,6 @@ export const get: EamusePluginRoute = async (req, data, send) => {
 
   const refId = $(data).attr().rid;
   const profile = await getProfile(version, refId);
-  console.dir(profile);
   if (profile == null) return send.status(Status.NOT_ALLOWED);
 
   const templates = await templatesFromVersion(version);

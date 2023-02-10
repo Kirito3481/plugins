@@ -1,4 +1,5 @@
 import { ID } from '../utils/id';
+import { CLTYPE } from '../utils/constants';
 import { ValidatedMap } from '../utils/validatedMap';
 
 export const formatProfile = (profile: ValidatedMap) => {
@@ -43,8 +44,8 @@ export const formatProfile = (profile: ValidatedMap) => {
       d_judgeAdj: String(profile.getInt('d_judgeAdj')),
       s_hispeed: String(profile.getFloat('s_hispeed')),
       d_hispeed: String(profile.getFloat('d_hispeed')),
-      s_liflen: String(profile.getInt('s_liflen')),
-      d_liflen: String(profile.getInt('d_liflen')),
+      s_liflen: String(profile.getInt('s_lift')),
+      d_liflen: String(profile.getInt('d_lift')),
       s_disp_judge: String(profile.getInt('s_disp_judge')),
       d_disp_judge: String(profile.getInt('d_disp_judge')),
       s_opstyle: String(profile.getInt('s_opstyle')),
@@ -73,6 +74,105 @@ export const formatProfile = (profile: ValidatedMap) => {
 
 export const unformatProfile = (data: any, oldProfile: ValidatedMap) => {
   const newProfile = oldProfile;
+  const attr = $(data).attr();
+
+  const cltype = parseInt(attr.cltype);
+  if (cltype === CLTYPE.SINGLE) newProfile.incrementInt('single_plays');
+  if (cltype === CLTYPE.DOUBLE) newProfile.incrementInt('double_plays');
+
+  newProfile.replaceInt('single_dj_points', parseInt(attr.s_achi));
+  newProfile.replaceInt('double_dj_points', parseInt(attr.d_achi));
+
+  newProfile.replaceInt('mode', parseInt(attr.mode));
+  newProfile.replaceInt('pmode', parseInt(attr.pmode));
+  newProfile.replaceInt('rtype', parseInt(attr.rtype));
+  newProfile.replaceInt('sp_opt', parseInt(attr.sp_opt));
+  newProfile.replaceInt('sp_opt', parseInt(attr.sp_opt));
+  newProfile.replaceInt('dp_opt', parseInt(attr.dp_opt));
+  newProfile.replaceInt('dp_opt2', parseInt(attr.dp_opt2));
+  newProfile.replaceInt('gpos', parseInt(attr.gpos));
+  newProfile.replaceInt('s_sorttype', parseInt(attr.s_sorttype));
+  newProfile.replaceInt('d_sorttype', parseInt(attr.d_sorttype));
+  newProfile.replaceInt('s_pace', parseInt(attr.s_pace));
+  newProfile.replaceInt('d_pace', parseInt(attr.d_pace));
+  newProfile.replaceInt('s_gno', parseInt(attr.s_gno));
+  newProfile.replaceInt('d_gno', parseInt(attr.d_gno));
+  newProfile.replaceInt('s_gtype', parseInt(attr.s_gtype));
+  newProfile.replaceInt('d_gtype', parseInt(attr.d_gtype));
+  newProfile.replaceInt('s_sdlen', parseInt(attr.s_sdlen));
+  newProfile.replaceInt('d_sdlen', parseInt(attr.d_sdlen));
+  newProfile.replaceInt('s_sdtype', parseInt(attr.s_sdtype));
+  newProfile.replaceInt('d_sdtype', parseInt(attr.d_sdtype));
+  newProfile.replaceInt('s_timing', parseInt(attr.s_timing));
+  newProfile.replaceInt('d_timing', parseInt(attr.d_timing));
+  newProfile.replaceFloat('s_notes', parseFloat(attr.s_notes));
+  newProfile.replaceFloat('d_notes', parseFloat(attr.d_notes));
+  newProfile.replaceInt('s_judge', parseInt(attr.s_judge));
+  newProfile.replaceInt('d_judge', parseInt(attr.d_judge));
+  newProfile.replaceInt('s_judgeAdj', parseInt(attr.s_judgeAdj));
+  newProfile.replaceInt('d_judgeAdj', parseInt(attr.d_judgeAdj));
+  newProfile.replaceFloat('s_hispeed', parseFloat(attr.s_hispeed));
+  newProfile.replaceFloat('d_hispeed', parseFloat(attr.d_hispeed));
+  newProfile.replaceInt('s_lift', parseInt(attr.s_lift));
+  newProfile.replaceInt('d_lift', parseInt(attr.d_lift));
+  newProfile.replaceInt('s_disp_judge', parseInt(attr.s_disp_judge));
+  newProfile.replaceInt('d_disp_judge', parseInt(attr.d_disp_judge));
+  newProfile.replaceInt('s_opstyle', parseInt(attr.s_opstyle));
+  newProfile.replaceInt('d_opstyle', parseInt(attr.d_opstyle));
+  newProfile.replaceInt('s_graph_score', parseInt(attr.s_graph_score));
+  newProfile.replaceInt('d_graph_score', parseInt(attr.d_graph_score));
+  newProfile.replaceInt('s_auto_scrach', parseInt(attr.s_auto_scrach));
+  newProfile.replaceInt('d_auto_scrach', parseInt(attr.d_auto_scrach));
+  newProfile.replaceInt('s_gauge_disp', parseInt(attr.s_gauge_disp));
+  newProfile.replaceInt('d_gauge_disp', parseInt(attr.d_gauge_disp));
+  newProfile.replaceInt('s_lane_brignt', parseInt(attr.s_lane_brignt));
+  newProfile.replaceInt('d_lane_brignt', parseInt(attr.d_lane_brignt));
+  newProfile.replaceInt('s_camera_layout', parseInt(attr.s_camera_layout));
+  newProfile.replaceInt('d_camera_layout', parseInt(attr.d_camera_layout));
+  newProfile.replaceInt('s_ghost_score', parseInt(attr.s_ghost_score));
+  newProfile.replaceInt('d_ghost_score', parseInt(attr.d_ghost_score));
+  newProfile.replaceInt('s_tsujigiri_disp', parseInt(attr.s_tsujigiri_disp));
+  newProfile.replaceInt('d_tsujigiri_disp', parseInt(attr.d_tsujigiri_disp));
+
+  const secret = $(data).element('secret');
+  if (secret) {
+    const secretMap = newProfile.getMap('secret');
+    secretMap.replaceBigIntArray('flg1', 3, secret.bigints('flg1'));
+    secretMap.replaceBigIntArray('flg1', 3, secret.bigints('flg2'));
+    secretMap.replaceBigIntArray('flg1', 3, secret.bigints('flg3'));
+    newProfile.replaceMap('secret', secretMap);
+  }
+
+  const achievements = $(data).element('achievements');
+  if (achievements) {
+    newProfile.replaceBigInt(
+      'visit_flg',
+      BigInt(achievements.attr().visit_flg)
+    );
+    newProfile.replaceInt(
+      'weekly_num',
+      parseInt(achievements.attr().weekly_num)
+    );
+    newProfile.replaceInt(
+      'last_weekly',
+      parseInt(achievements.attr().last_weekly)
+    );
+
+    const trophy = achievements.bigints('trophy');
+    if (trophy) {
+      newProfile.replaceBigIntArray('trophy', 160, trophy);
+    }
+  }
+
+  const deller = $(data).element('deller');
+  if (deller) {
+    newProfile.replaceInt(
+      'deller',
+      newProfile.getInt('deller') + parseInt(deller.attr().deller)
+    );
+  }
+
+  console.dir(newProfile, { depth: null });
 
   return newProfile;
 };

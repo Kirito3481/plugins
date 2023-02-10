@@ -132,37 +132,37 @@ export class ValidatedMap extends Map<string, any> {
   replaceInt(name: string, val: any) {
     if (val == null) return;
     if (typeof val !== 'number') return;
-    this[name] = val;
+    this.set(name, val);
   }
 
   replaceBigInt(name: string, val: any) {
     if (val == null) return;
     if (typeof val !== 'bigint') return;
-    this[name] = val;
+    this.set(name, val);
   }
 
   replaceFloat(name: string, val: any) {
     if (val == null) return;
     if (!isFloat(val)) return;
-    this[name] = val;
+    this.set(name, val);
   }
 
   replaceBool(name: string, val: any) {
     if (val == null) return;
     if (typeof val !== 'boolean') return;
-    this[name] = val;
+    this.set(name, val);
   }
 
   replaceStr(name: string, val: any) {
     if (val == null) return;
     if (typeof val !== 'string') return;
-    this[name] = val;
+    this.set(name, val);
   }
 
   replaceBytes(name: string, val: any) {
     if (val == null) return;
     if (!Buffer.isBuffer(val)) return;
-    this[name] = val;
+    this.set(name, val);
   }
 
   replaceIntArray(name: string, length: number, val: any) {
@@ -172,7 +172,7 @@ export class ValidatedMap extends Map<string, any> {
     val.forEach(v => {
       if (typeof v !== 'number') return;
     });
-    this[name] = val as number[];
+    this.set(name, val);
   }
 
   replaceBigIntArray(name: string, length: number, val: any) {
@@ -182,7 +182,7 @@ export class ValidatedMap extends Map<string, any> {
     val.forEach(v => {
       if (typeof v !== 'bigint') return;
     });
-    this[name] = val as bigint[];
+    this.set(name, val);
   }
 
   replaceBoolArray(name: string, length: number, val: any) {
@@ -192,7 +192,7 @@ export class ValidatedMap extends Map<string, any> {
     val.forEach(v => {
       if (typeof v !== 'boolean') return;
     });
-    this[name] = val as boolean[];
+    this.set(name, val);
   }
 
   replaceBufferArray(name: string, length: number, val: any) {
@@ -202,7 +202,7 @@ export class ValidatedMap extends Map<string, any> {
     val.forEach(v => {
       if (!Buffer.isBuffer(v)) return;
     });
-    this[name] = val as Buffer[];
+    this.set(name, val);
   }
 
   replaceStrArray(name: string, length: number, val: any) {
@@ -212,18 +212,18 @@ export class ValidatedMap extends Map<string, any> {
     val.forEach(v => {
       if (typeof v !== 'string') return;
     });
-    this[name] = val as string[];
+    this.set(name, val);
   }
 
   replaceMap(name: string, val: any) {
     if (val == null) return;
     if (!(val instanceof Map)) return;
-    this[name] = val;
+    this.set(name, val);
   }
 
   incrementInt(name: string) {
-    if (!this.has(name)) this[name] = 1;
-    else if (typeof this[name] !== 'number') this[name] = 1;
-    else this[name] = this[name] + 1;
+    if (!this.has(name)) this.set(name, 1);
+    else if (typeof this.get(name) !== 'number') this.set(name, 1);
+    else this.set(name, this.get(name) + 1);
   }
 }
