@@ -32,7 +32,9 @@ export const reg: EamusePluginRoute = async (req, data, send) => {
   if (version == null) return send.status(Status.NOT_ALLOWED);
 
   const refId = $(data).attr().rid;
-  const profile = await newProfile(version, refId);
+  const name = $(data).attr().name;
+  const pid = parseInt($(data).attr().pid);
+  const profile = await newProfile(version, refId, name, pid);
   if (profile == null) return send.status(Status.NOT_ALLOWED);
 
   return send.object(
