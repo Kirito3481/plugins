@@ -1,6 +1,7 @@
-import { getProfile, newProfile, Profile } from '../models/profile';
+import { getProfile, newProfile, Profile, putProfile } from '../models/profile';
 import { Status, versionFromModel } from '../utils/constants';
 import { ID } from '../utils/id';
+import { templatesFromVersion } from '../utils/templatesImport';
 
 export const oldget: EamusePluginRoute = async (req, data, send) => {
   const refId = $(data).attr().rid;
@@ -17,9 +18,13 @@ export const get: EamusePluginRoute = async (req, data, send) => {
 
   const refId = $(data).attr().rid;
   const profile = await getProfile(version, refId);
+  console.dir(profile);
   if (profile == null) return send.status(Status.NOT_ALLOWED);
 
-  return send.object(profile);
+  const templates = await templatesFromVersion(version);
+  if (templates == null) return null;
+
+  return send.object(templates.formatProfile(profile));
 };
 
 export const reg: EamusePluginRoute = async (req, data, send) => {
@@ -42,4 +47,16 @@ export const visit: EamusePluginRoute = async (req, data, send) => {
   return send.object(
     K.ATTR({ anum: '0', snum: '0', pnum: '0', aflg: '0', sflg: '0', pflg: '0' })
   );
+};
+
+export const save: EamusePluginRoute = async (req, data, send) => {
+  console.log(U.toXML({ data }));
+
+  const version = versionFromModel(req.model);
+  if (version == null) return send.status(Status.NOT_ALLOWED);
+
+  const extId = parseInt($(data).attr().iidxid);
+  await putProfile(version, data, extId);
+
+  return send.success();
 };

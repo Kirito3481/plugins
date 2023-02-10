@@ -70,3 +70,9 @@ export const formatProfile = (profile: ValidatedMap) => {
     rlist: {},
   };
 };
+
+export const unformatProfile = (data: any, oldProfile: ValidatedMap) => {
+  const newProfile = oldProfile;
+
+  return newProfile;
+};

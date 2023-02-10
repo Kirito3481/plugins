@@ -1,31 +1,58 @@
 import { Version } from '../utils/constants';
+import { templatesFromVersion } from '../utils/templatesImport';
 import { ValidatedMap } from '../utils/validatedMap';
 
 export interface Profile {
   collection: 'profile';
 
   version: number;
-
   extId: number;
-
   data?: any;
 }
 
-export const getProfile = async (version: number, refId: string) => {
-  const profile = await DB.FindOne<Profile>(refId, {
+export const putProfile = async (
+  version: number,
+  data: any,
+  extId?: number
+) => {
+  if (extId == null) return;
+
+  const oldProfile = await getProfile(version, undefined, extId);
+  const refId = oldProfile.getStr('refid');
+  const template = await templatesFromVersion(version);
+  const newProfile = template.unformatProfile(data, oldProfile);
+  if (newProfile != null) {
+    newProfile.delete('refid');
+    newProfile.delete('extid');
+
+    const dataObj = {};
+    newProfile.forEach((value, key) => (dataObj[key] = value));
+
+    await DB.Upsert<Profile>(
+      refId,
+      { collection: 'profile', version, extId },
+      { $set: { data: dataObj } }
+    );
+  }
+};
+
+export const getProfile = async (
+  version: number,
+  refId?: string,
+  extId?: number
+) => {
+  const profile = await DB.FindOne<Profile>(refId != null ? refId : null, {
     collection: 'profile',
     version,
+    ...(extId != null && { extId }),
   });
   if (profile == null) return null;
 
-  if (profile.version === Version.HEROIC_VERSE) {
-    const hv = import('../templates/heroicverse');
-    return (await hv).formatProfile(
-      new ValidatedMap({ extid: profile.extId, ...profile.data })
-    );
-  } else {
-    return null;
-  }
+  return new ValidatedMap({
+    refid: profile.__refid,
+    extid: profile.extId,
+    ...profile.data,
+  });
 };
 
 export const newProfile = async (
@@ -66,5 +93,9 @@ export const newProfile = async (
     return null;
   }
 
-  return new ValidatedMap({ extid: extId, ...newProfile.data });
+  return new ValidatedMap({
+    refid: newProfile.__refid,
+    extid: extId,
+    ...newProfile.data,
+  });
 };

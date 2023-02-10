@@ -1,3 +1,8 @@
+export enum CLTYPE {
+  SINGLE,
+  DOUBLE,
+}
+
 export enum Status {
   NOT_ALLOWED = 110,
 }

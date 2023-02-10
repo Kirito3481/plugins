@@ -23,11 +23,13 @@ export const register = () => {
   R.Route('IIDX27pc.reg', pc.reg);
   R.Route('IIDX27pc.get', pc.get);
   R.Route('IIDX27pc.visit', pc.visit);
+  R.Route('IIDX27pc.save', pc.save);
+  R.Route('IIDX27pc.logout', true);
 
   R.Route('IIDX27music.getrank', music.getrank);
 
   R.Unhandled((req, data, send) => {
-    console.dir(data, { depth: null });
+    console.log(U.toXML({ [req.module]: data }));
     return send.object(K.ATTR({ status: '110' }));
   });
 };
