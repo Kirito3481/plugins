@@ -18,10 +18,10 @@ export const putProfile = async (
   if (extId == null) return;
 
   const oldProfile = await getProfile(version, undefined, extId);
-  const refId = oldProfile.getStr('refid');
   const template = await templatesFromVersion(version);
   const newProfile = template.unformatProfile(data, oldProfile);
   if (newProfile != null) {
+    const refId = oldProfile.getStr('refid');
     newProfile.delete('refid');
     newProfile.delete('extid');
 
