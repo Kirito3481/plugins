@@ -15,8 +15,9 @@ export class ValidatedMap extends Map<string, any> {
   }
 
   getBigInt(name: string, def = BigInt(0)) {
-    const val = this.get(name);
+    let val = this.get(name);
     if (val == null) return def;
+    val = BigInt(val);
     if (typeof val !== 'bigint') return def;
     return val;
   }
@@ -72,6 +73,7 @@ export class ValidatedMap extends Map<string, any> {
     if (!Array.isArray(val)) return def;
     if (val.length !== length) return def;
     val.forEach(v => {
+      v = BigInt(v);
       if (typeof val !== 'bigint') return def;
     });
     return val;
@@ -120,12 +122,12 @@ export class ValidatedMap extends Map<string, any> {
   }
 
   getMap(name: string, def?: Map<string, any>): ValidatedMap {
-    if (def == null) def = new Map();
+    if (def == null) def = new Map<string, any>();
     const validatedDefault = new ValidatedMap(def);
 
     const val = this.get(name);
     if (val == null) return validatedDefault;
-    if (!(val instanceof Map)) return validatedDefault;
+    if (typeof val !== 'object') return validatedDefault;
     return new ValidatedMap(val);
   }
 
@@ -138,7 +140,7 @@ export class ValidatedMap extends Map<string, any> {
   replaceBigInt(name: string, val: any) {
     if (val == null) return;
     if (typeof val !== 'bigint') return;
-    this.set(name, val);
+    this.set(name, val.toString());
   }
 
   replaceFloat(name: string, val: any) {
@@ -182,7 +184,10 @@ export class ValidatedMap extends Map<string, any> {
     val.forEach(v => {
       if (typeof v !== 'bigint') return;
     });
-    this.set(name, val);
+    this.set(
+      name,
+      val.map(v => v.toString())
+    );
   }
 
   replaceBoolArray(name: string, length: number, val: any) {
@@ -217,7 +222,7 @@ export class ValidatedMap extends Map<string, any> {
 
   replaceMap(name: string, val: any) {
     if (val == null) return;
-    if (!(val instanceof Map)) return;
+    if (!(val instanceof ValidatedMap)) return;
     this.set(name, val);
   }
 

@@ -25,7 +25,16 @@ export const putProfile = async (
     newProfile.delete('extid');
 
     const dataObj = {};
-    newProfile.forEach((value, key) => (dataObj[key] = value));
+    newProfile.forEach((value, key) => {
+      if (value instanceof Map) {
+        const mapObj = {};
+        value.forEach((v, k) => {
+          mapObj[k] = v;
+        });
+        value = mapObj;
+      }
+      dataObj[key] = value;
+    });
 
     await DB.Upsert<Profile>(
       refId,
@@ -40,6 +49,7 @@ export const getProfile = async (
   refId?: string,
   extId?: number
 ) => {
+  if (refId == null && extId == null) return null;
   const profile = await DB.FindOne<Profile>(refId != null ? refId : null, {
     collection: 'profile',
     version,

@@ -70,6 +70,17 @@ export const formatProfile = (profile: ValidatedMap) => {
 
     rlist: {},
 
+    ea_premium_course: {},
+
+    floor_infection3: K.ATTR({ music_list: '-1' }),
+    bemani_vote: K.ATTR({ music_list: '-1' }),
+
+    secret: {
+      flg1: K.ARRAY('s64', [BigInt(-1), BigInt(-1), BigInt(-1)]),
+      flg2: K.ARRAY('s64', [BigInt(-1), BigInt(-1), BigInt(-1)]),
+      flg3: K.ARRAY('s64', [BigInt(-1), BigInt(-1), BigInt(-1)]),
+    },
+
     ...(profile.has('step') &&
       (() => {
         const stepMap = profile.getMap('step');
@@ -125,29 +136,6 @@ export const formatProfile = (profile: ValidatedMap) => {
     // }),
 
     deller: K.ATTR({ deller: String(profile.getInt('deller')), rate: '1.0' }),
-
-    ...(profile.has('sp_notes_radar') && {
-      notes_radar: K.ATTR(
-        { style: '0' },
-        {
-          radar_score: K.ARRAY('s32', profile.getIntArray('sp_notes_radar', 6)),
-        }
-      ),
-    }),
-    ...(profile.has('dp_notes_radar') && {
-      notes_radar: K.ATTR(
-        { style: '1' },
-        {
-          radar_score: K.ARRAY('s32', profile.getIntArray('dp_notes_radar', 6)),
-        }
-      ),
-    }),
-
-    ...(profile.has('language') && {
-      language_setting: K.ATTR({
-        language: String(profile.getInt('language')),
-      }),
-    }),
   };
 };
 
@@ -315,31 +303,6 @@ export const unformatProfile = (data: any, oldProfile: ValidatedMap) => {
     );
     stepMap.replaceBool('is_track_ticket', step.bool('is_track_ticket'));
     newProfile.replaceMap('step', stepMap);
-  }
-
-  const notesRadar = $(data).element('notes_radar');
-  if (notesRadar) {
-    if (notesRadar.attr().style === '0') {
-      newProfile.replaceIntArray(
-        'sp_notes_radar',
-        6,
-        notesRadar.numbers('radar_score')
-      );
-    } else if (notesRadar.attr().style === '1') {
-      newProfile.replaceIntArray(
-        'dp_notes_radar',
-        6,
-        notesRadar.numbers('radar_score')
-      );
-    }
-  }
-
-  const languageSetting = $(data).element('language_setting');
-  if (languageSetting) {
-    newProfile.replaceInt(
-      'language',
-      parseInt(languageSetting.attr().language)
-    );
   }
 
   console.dir(newProfile, { depth: null });

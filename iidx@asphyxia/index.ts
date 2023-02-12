@@ -9,24 +9,29 @@ import * as music from './handlers/music';
 export const register = () => {
   R.GameCode('LDJ');
 
-  R.Route('IIDX27shop.getname', shop_getname);
-  R.Route('IIDX27shop.savename', true);
-  R.Route('IIDX27shop.sentinfo', true);
-  R.Route('IIDX27shop.sendescapepackageinfo', shop_sendescapepackageinfo);
+  const GameRoute = (method: string, handler: boolean | EamusePluginRoute) => {
+    R.Route(`IIDX26${method}`, handler);
+    R.Route(`IIDX27${method}`, handler);
+  };
 
-  R.Route('IIDX27gameSystem.systemInfo', gameSystem_systemInfo);
+  GameRoute('shop.getname', shop_getname);
+  GameRoute('shop.savename', true);
+  GameRoute('shop.sentinfo', true);
+  GameRoute('shop.sendescapepackageinfo', shop_sendescapepackageinfo);
 
-  R.Route('IIDX27pc.playstart', true);
-  R.Route('IIDX27pc.playend', true);
-  R.Route('IIDX27pc.delete', true);
-  R.Route('IIDX27pc.oldget', pc.oldget);
-  R.Route('IIDX27pc.reg', pc.reg);
-  R.Route('IIDX27pc.get', pc.get);
-  R.Route('IIDX27pc.visit', pc.visit);
-  R.Route('IIDX27pc.save', pc.save);
-  R.Route('IIDX27pc.logout', true);
+  GameRoute('gameSystem.systemInfo', gameSystem_systemInfo);
 
-  R.Route('IIDX27music.getrank', music.getrank);
+  GameRoute('pc.playstart', true);
+  GameRoute('pc.playend', true);
+  GameRoute('pc.delete', true);
+  GameRoute('pc.oldget', pc.oldget);
+  GameRoute('pc.reg', pc.reg);
+  GameRoute('pc.get', pc.get);
+  GameRoute('pc.visit', pc.visit);
+  GameRoute('pc.save', pc.save);
+  GameRoute('pc.logout', true);
+
+  GameRoute('music.getrank', music.getrank);
 
   R.Unhandled((req, data, send) => {
     console.log(U.toXML({ [req.module]: data }));

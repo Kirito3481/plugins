@@ -21,7 +21,7 @@ export const get: EamusePluginRoute = async (req, data, send) => {
   if (profile == null) return send.status(Status.NOT_ALLOWED);
 
   const templates = await templatesFromVersion(version);
-  if (templates == null) return null;
+  if (templates == null) return send.status(Status.NOT_ALLOWED);
 
   return send.object(templates.formatProfile(profile));
 };
