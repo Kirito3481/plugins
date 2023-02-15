@@ -25,8 +25,8 @@ export class ValidatedMap extends Map<string, any> {
   getFloat(name: string, def = 0.0) {
     const val = this.get(name);
     if (val == null) return def;
-    if (!isFloat(val)) return def;
-    return parseFloat(val);
+    if (!val.includes('.')) return def;
+    return val;
   }
 
   getBool(name: string, def = false) {
@@ -145,7 +145,7 @@ export class ValidatedMap extends Map<string, any> {
 
   replaceFloat(name: string, val: any) {
     if (val == null) return;
-    if (!isFloat(val)) return;
+    if (!val.includes('.')) return;
     this.set(name, val);
   }
 

@@ -1,8 +1,4 @@
-import {
-  gameSystem_systemInfo,
-  shop_getname,
-  shop_sendescapepackageinfo,
-} from './handlers/common';
+import * as common from './handlers/common';
 import * as pc from './handlers/pc';
 import * as music from './handlers/music';
 
@@ -10,17 +6,17 @@ export const register = () => {
   R.GameCode('LDJ');
 
   const GameRoute = (method: string, handler: boolean | EamusePluginRoute) => {
-    R.Route(`IIDX26${method}`, handler);
-    R.Route(`IIDX27${method}`, handler);
+    R.Route(`IIDX29${method}`, handler);
   };
 
-  GameRoute('shop.getname', shop_getname);
+  GameRoute('shop.getname', common.shop_getname);
   GameRoute('shop.savename', true);
   GameRoute('shop.sentinfo', true);
-  GameRoute('shop.sendescapepackageinfo', shop_sendescapepackageinfo);
+  GameRoute('shop.sendescapepackageinfo', common.shop_sendescapepackageinfo);
 
-  GameRoute('gameSystem.systemInfo', gameSystem_systemInfo);
+  GameRoute('gameSystem.systemInfo', common.gameSystem_systemInfo);
 
+  GameRoute('pc.common', pc.common);
   GameRoute('pc.playstart', true);
   GameRoute('pc.playend', true);
   GameRoute('pc.delete', true);

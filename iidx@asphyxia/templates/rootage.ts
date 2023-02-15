@@ -2,6 +2,20 @@ import { ID } from '../utils/id';
 import { CLTYPE } from '../utils/constants';
 import { ValidatedMap } from '../utils/validatedMap';
 
+export const common = () =>
+  K.ATTR(
+    { expire: '600' },
+    {
+      monthly_mranking: K.ARRAY('u16', new Array(20).fill(0)),
+      total_mranking: K.ARRAY('u16', new Array(20).fill(0)),
+      internet_ranking: {},
+      secret_ex_course: {},
+      kac_mid: K.ARRAY('s32', new Array(30).fill(0)),
+      kac_clid: K.ARRAY('s32', new Array(30).fill(0)),
+      ir: K.ATTR({ beat: '0' }),
+    }
+  );
+
 export const formatProfile = (profile: ValidatedMap) => {
   return {
     pcdata: K.ATTR({

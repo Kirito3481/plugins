@@ -2,6 +2,8 @@ import { ID } from '../utils/id';
 import { CLTYPE } from '../utils/constants';
 import { ValidatedMap } from '../utils/validatedMap';
 
+export const common = () => ({});
+
 export const formatProfile = (profile: ValidatedMap) => {
   return {
     pcdata: K.ATTR({

@@ -2,4 +2,4 @@
 
 ## Supported Versions
 
-- beatmania IIDX 27 HEROIC VERSE
+- beatmania IIDX 29 CastHour

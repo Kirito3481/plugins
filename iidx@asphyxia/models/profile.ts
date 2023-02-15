@@ -1,13 +1,61 @@
 import { templatesFromVersion } from '../utils/templatesImport';
 import { ValidatedMap } from '../utils/validatedMap';
 
-export interface Profile {
+export interface ProfileDoc {
   collection: 'profile';
 
   version: number;
   extId: number;
-  data?: any;
+
+  data: any;
 }
+
+export class Profile extends ValidatedMap {
+  version;
+  refId;
+  extId;
+  constructor(version: number, refId: string, extId: number, initValues = {}) {
+    super(initValues);
+    this.version = version;
+    this.refId = refId;
+    this.extId = extId;
+  }
+}
+
+export const getProfile = async (
+  version: number,
+  refId?: string,
+  extId?: number
+) => {
+  if (refId == null && extId == null) return null;
+  let profile = await DB.FindOne<ProfileDoc>(refId != null ? refId : null, {
+    collection: 'profile',
+    version,
+    ...(extId != null && { extId }),
+  });
+  if (profile == null) {
+    if (refId == null) return null;
+
+    const count = await DB.Count<ProfileDoc>(refId, { collection: 'profile' });
+    if (count > 0) {
+      const profiles = await DB.Find<ProfileDoc>(refId, {
+        collection: 'profile',
+      });
+      const profile = profiles.sort().reverse()[0];
+
+      return newProfile(version, refId, profile.data.name, profile.data.pid);
+    } else {
+      return null;
+    }
+  }
+
+  return new Profile(
+    profile.version,
+    profile.__refid,
+    profile.extId,
+    profile.data
+  );
+};
 
 export const putProfile = async (
   version: number,
@@ -20,7 +68,7 @@ export const putProfile = async (
   const template = await templatesFromVersion(version);
   const newProfile = template.unformatProfile(data, oldProfile);
   if (newProfile != null) {
-    const refId = oldProfile.getStr('refid');
+    const refId = oldProfile.refId;
     newProfile.delete('refid');
     newProfile.delete('extid');
 
@@ -36,32 +84,12 @@ export const putProfile = async (
       dataObj[key] = value;
     });
 
-    await DB.Upsert<Profile>(
+    await DB.Upsert<ProfileDoc>(
       refId,
-      { collection: 'profile', version, extId },
+      { collection: 'profile', extId },
       { $set: { data: dataObj } }
     );
   }
-};
-
-export const getProfile = async (
-  version: number,
-  refId?: string,
-  extId?: number
-) => {
-  if (refId == null && extId == null) return null;
-  const profile = await DB.FindOne<Profile>(refId != null ? refId : null, {
-    collection: 'profile',
-    version,
-    ...(extId != null && { extId }),
-  });
-  if (profile == null) return null;
-
-  return new ValidatedMap({
-    refid: profile.__refid,
-    extid: profile.extId,
-    ...profile.data,
-  });
 };
 
 export const newProfile = async (
@@ -80,21 +108,17 @@ export const newProfile = async (
     if (check.length === 0) break;
   }
 
-  let newProfile = await DB.FindOne<Profile>(refId, {
+  let newProfile = await DB.FindOne<ProfileDoc>(refId, {
     collection: 'profile',
     version,
   });
 
   if (newProfile == null) {
-    const newMap = new ValidatedMap({ name, pid });
-    const dataObj = {};
-    newMap.forEach((value, key) => (dataObj[key] = value));
-
-    newProfile = await DB.Insert<Profile>(refId, {
+    newProfile = await DB.Insert<ProfileDoc>(refId, {
       collection: 'profile',
-      version,
       extId,
-      data: dataObj,
+      version,
+      data: { name, pid },
     });
   }
   if (newProfile == null) {
@@ -102,9 +126,8 @@ export const newProfile = async (
     return null;
   }
 
-  return new ValidatedMap({
-    refid: newProfile.__refid,
-    extid: extId,
-    ...newProfile.data,
+  return new Profile(version, newProfile.__refid, newProfile.extId, {
+    name,
+    pid,
   });
 };

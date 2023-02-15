@@ -1,10 +1,12 @@
 import { Version } from './constants';
 
 export const templatesFromVersion = async (version: number) => {
-  if (version === Version.HEROIC_VERSE) {
-    return await import('../templates/heroicverse');
-  } else if (version === Version.ROOTAGE) {
+  if (version === Version.ROOTAGE) {
     return await import('../templates/rootage');
+  } else if (version === Version.HEROIC_VERSE) {
+    return await import('../templates/heroicverse');
+  } else if (version === Version.CASTHOUR) {
+    return await import('../templates/casthour');
   } else {
     return null;
   }
