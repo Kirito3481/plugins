@@ -79,7 +79,7 @@ export class ValidatedMap extends Map<string, any> {
     return val;
   }
 
-  getBoolArray(name: string, length: number, def?: boolean[]): boolean[] {
+  getBoolArray(name: string, length: number, def?: boolean[]) {
     if (def == null) def = new Array(length).fill(false);
     if (def.length !== length) throw new Error('Gave default of wrong length!');
 
@@ -89,6 +89,7 @@ export class ValidatedMap extends Map<string, any> {
     if (val.length !== length) return def;
     val.forEach(v => {
       if (typeof val !== 'boolean') return def;
+      v = parseInt(v);
     });
     return val;
   }

@@ -1,7 +1,8 @@
 import { ID } from '../utils/id';
-import { CLTYPE } from '../utils/constants';
+import { CLTYPE, dbToGameClearStatus, Version } from '../utils/constants';
 import { ValidatedMap } from '../utils/validatedMap';
 import { Profile } from '../models/profile';
+import { ChartType, Score } from '../models/score';
 
 export const common = () =>
   K.ATTR(
@@ -125,19 +126,66 @@ export const formatProfile = (profile: Profile) => {
       d_auto_adjust: String(profile.getInt('d_auto_adjust')),
     }),
 
-    weekly_achieve: K.ATTR({
-      weekly_achieve_0: '0',
-      weekly_achieve_1: '0',
-      weekly_achieve_2: '0',
-      weekly_achieve_3: '0',
-      weekly_achieve_4: '0',
+    lightning_play_data: K.ATTR({
+      spnum: String(profile.getInt('lightning_single_plays')),
+      dpnum: String(profile.getInt('lightning_double_plays')),
     }),
 
-    spdp_rival: K.ATTR({ flg: '0' }),
+    ...(profile.has('lightning_setting') &&
+      (() => {
+        const lightningSettingMap = profile.getMap('lightning_setting');
+        return {
+          lightning_setting: K.ATTR(
+            {
+              headphone_vol: String(
+                lightningSettingMap.getInt('headphone_vol')
+              ),
+              resistance_sp_left: String(
+                lightningSettingMap.getInt('resistance_sp_left')
+              ),
+              resistance_sp_right: String(
+                lightningSettingMap.getInt('resistance_sp_right')
+              ),
+              resistance_dp_left: String(
+                lightningSettingMap.getInt('resistance_dp_left')
+              ),
+              resistance_dp_right: String(
+                lightningSettingMap.getInt('resistance_dp_right')
+              ),
+              skin_0: String(lightningSettingMap.getInt('skin_0')),
+              flg_skin_0: String(lightningSettingMap.getInt('flg_skin_0')),
+            },
+            {
+              slider: K.ARRAY(
+                's32',
+                lightningSettingMap.getIntArray('slider', 7)
+              ),
+              light: K.ARRAY(
+                'bool',
+                lightningSettingMap.getBoolArray('light', 10)
+              ),
+              concentration: K.ITEM(
+                'bool',
+                lightningSettingMap.getBool('concentration')
+              ),
+            }
+          ),
+        };
+      })()),
 
-    bind_eaappli: {},
+    // weekly_achieve: K.ATTR({
+    //   weekly_achieve_0: '0',
+    //   weekly_achieve_1: '0',
+    //   weekly_achieve_2: '0',
+    //   weekly_achieve_3: '0',
+    //   weekly_achieve_4: '0',
+    // }),
+
+    spdp_rival: K.ATTR({ flg: String(profile.getInt('spdp_rival_flg')) }),
+
+    // bind_eaappli: {},
     ea_premium_course: {},
-    enable_qr_reward: {},
+    // enable_qr_reward: {},
 
     secret: {
       flg1: K.ARRAY('s64', [BigInt(-1), BigInt(-1), BigInt(-1)]),
@@ -158,34 +206,34 @@ export const formatProfile = (profile: Profile) => {
 
     music_memo: {
       music: (() => {
-        const musicMemo = profile.get('music_memo') as number[][];
-        const single = musicMemo[0];
-        const double = musicMemo[1];
         const musics = [];
+        const musicMemo = profile.get('music_memo') as number[][];
+        if (musicMemo) {
+          const single = musicMemo[0];
+          const double = musicMemo[1];
 
-        if (single) {
-          single.forEach((id, index) =>
-            musics.push(
-              K.ATTR({
-                index: String(index),
-                play_style: '0',
-                music_id: String(id),
-              })
-            )
-          );
-          musics.push(single);
-        }
-        if (double) {
-          double.forEach((id, index) =>
-            musics.push(
-              K.ATTR({
-                index: String(index),
-                play_style: '1',
-                music_id: String(id),
-              })
-            )
-          );
-          musics.push(double);
+          if (single) {
+            single.forEach((id, index) =>
+              musics.push(
+                K.ATTR({
+                  index: String(index),
+                  play_style: '0',
+                  music_id: String(id),
+                })
+              )
+            );
+          }
+          if (double) {
+            double.forEach((id, index) =>
+              musics.push(
+                K.ATTR({
+                  index: String(index),
+                  play_style: '1',
+                  music_id: String(id),
+                })
+              )
+            );
+          }
         }
 
         return musics;
@@ -213,20 +261,20 @@ export const formatProfile = (profile: Profile) => {
 
     rlist: {},
 
-    original_course: {},
-    random_course: {},
+    // original_course: {},
+    // random_course: {},
 
-    follow_data: {
-      course_data: [],
-    },
+    // follow_data: {
+    //   course_data: [],
+    // },
 
-    ir_data: { e: [] },
+    // ir_data: { e: [] },
 
-    secret_course_data: { e: [] },
+    // secret_course_data: { e: [] },
 
-    classic_course_data: { score_data: [] },
+    // classic_course_data: { score_data: [] },
 
-    convention_course: { course_data: [] },
+    // convention_course: { course_data: [] },
 
     dj_rank: [],
 
@@ -234,31 +282,31 @@ export const formatProfile = (profile: Profile) => {
 
     notes_radar: [],
 
-    tonjyutsu: K.ATTR({ platinum_pass: '0', black_pass: '0' }),
+    // tonjyutsu: K.ATTR({ platinum_pass: '0', black_pass: '0' }),
 
-    shitei: K.ATTR(
-      {
-        have_master: '0',
-        have_disciple: '0',
-        clear_disciple: '0',
-        discple_card_clear_num: '0',
-        my_card_card_clear_num: '0',
-      },
-      { bingo_data: [] }
-    ),
+    // shitei: K.ATTR(
+    //   {
+    //     have_master: '0',
+    //     have_disciple: '0',
+    //     clear_disciple: '0',
+    //     discple_card_clear_num: '0',
+    //     my_card_card_clear_num: '0',
+    //   },
+    //   { bingo_data: [] }
+    // ),
 
-    weekly: K.ATTR({ wid: '0', mid: '0' }),
+    // weekly: K.ATTR({ wid: '0', mid: '0' }),
 
     weekly_score: [],
 
-    join_shop: K.ATTR({
-      joinflg: '0',
-      join_cflg: '0',
-      join_id: '0',
-      join_name: '0',
-    }),
+    // join_shop: K.ATTR({
+    //   joinflg: '0',
+    //   join_cflg: '0',
+    //   join_id: '0',
+    //   join_name: '0',
+    // }),
 
-    visitor: K.ATTR({ anum: '0', snum: '0', pnum: '0', vs_flg: '0' }),
+    // visitor: K.ATTR({ anum: '0', snum: '0', pnum: '0', vs_flg: '0' }),
 
     ...(profile.has('step') &&
       (() => {
@@ -287,12 +335,12 @@ export const formatProfile = (profile: Profile) => {
         };
       })()),
 
-    packinfo: K.ATTR({
-      pack_id: '0',
-      music_0: '0',
-      music_1: '0',
-      music_2: '0',
-    }),
+    // packinfo: K.ATTR({
+    //   pack_id: '0',
+    //   music_0: '0',
+    //   music_1: '0',
+    //   music_2: '0',
+    // }),
 
     achievements: K.ATTR(
       {
@@ -308,17 +356,17 @@ export const formatProfile = (profile: Profile) => {
       }
     ),
 
-    deller: K.ATTR({ deller: '0', rate: '0' }),
+    deller: K.ATTR({ deller: String(profile.getInt('deller')), rate: '0' }),
 
     orb_data: K.ATTR({ rest_orb: '0', present_orb: '0' }),
 
     expert_point: { detail: [] },
 
-    pay_per_use_item: K.ATTR({ item_num: '0' }),
+    // pay_per_use_item: K.ATTR({ item_num: '0' }),
 
-    present_pay_per_use_item: K.ATTR({ item_num: '0' }),
+    // present_pay_per_use_item: K.ATTR({ item_num: '0' }),
 
-    qpro_ticket: K.ATTR({ ticket_num: '0', total_ticket_num: '0' }),
+    // qpro_ticket: K.ATTR({ ticket_num: '0', total_ticket_num: '0' }),
 
     old_linkage_secret_flg: K.ATTR({
       floor_infection4: '-1',
@@ -358,7 +406,7 @@ export const formatProfile = (profile: Profile) => {
 
     // arena_penalty: {},
 
-    tsujigiri: K.ATTR({ total_num_sp: '0', total_num_dp: '0' }),
+    // tsujigiri: K.ATTR({ total_num_sp: '0', total_num_dp: '0' }),
 
     // tsujigiri_hidden_chara: {
     //   appearance_info: K.ATTR({}),
@@ -368,11 +416,11 @@ export const formatProfile = (profile: Profile) => {
 
     // weekly_result: K.ATTR({ week_id: '0', music_id: '0' }, { detail: [] }),
 
-    skin_customize_flg: K.ATTR({
-      skin_frame_flg: '0',
-      skin_bgm_flg: '0',
-      skin_lane_flg3: '0',
-    }),
+    // skin_customize_flg: K.ATTR({
+    //   skin_frame_flg: '0',
+    //   skin_bgm_flg: '0',
+    //   skin_lane_flg3: '0',
+    // }),
 
     // event_1: K.ATTR(
     //   {
@@ -440,10 +488,12 @@ export const formatProfile = (profile: Profile) => {
       }
     ),*/
 
-    language_setting: K.ATTR({ language: '0' }),
-    movie_agreement: K.ATTR({ agreement_version: '0' }),
+    language_setting: K.ATTR({ language: String(profile.getInt('language')) }),
+    movie_agreement: K.ATTR({
+      agreement_version: String(profile.getInt('movie_agreement_version')),
+    }),
     movie_setting: {
-      hide_name: K.ITEM('bool', false),
+      hide_name: K.ITEM('bool', profile.getBool('movie_hide_name')),
     },
 
     exam_data: [],
@@ -454,8 +504,6 @@ export const formatProfile = (profile: Profile) => {
       flg1: K.ARRAY('s64', [BigInt(-1), BigInt(-1), BigInt(-1)]),
       flg2: K.ARRAY('s64', [BigInt(-1), BigInt(-1), BigInt(-1)]),
     },
-
-    questionnaire: { questionnaire_data: [] },
   };
 };
 
@@ -777,73 +825,86 @@ export const unformatProfile = (data: any, oldProfile: ValidatedMap) => {
     newProfile.replaceMap('world_tourism', worldTourismMap);
   }
 
-  // const qproSecret = $(data).element('qpro_secret');
-  // if (qproSecret) {
-  //   const qproSecretMap = newProfile.getMap('qpro_secret');
-  //   qproSecretMap.replaceBigIntArray('head', 7, qproSecret.bigints('haed'));
-  //   qproSecretMap.replaceBigIntArray('hair', 7, qproSecret.bigints('hair'));
-  //   qproSecretMap.replaceBigIntArray('face', 7, qproSecret.bigints('face'));
-  //   qproSecretMap.replaceBigIntArray('body', 7, qproSecret.bigints('body'));
-  //   qproSecretMap.replaceBigIntArray('hand', 7, qproSecret.bigints('hand'));
-  //   console.dir(qproSecretMap);
-  //   newProfile.replaceMap('qpro_secret', qproSecretMap);
-  // }
-
-  // const step = $(data).element('step');
-  // if (step) {
-  //   const stepMap = newProfile.getMap('step');
-  //   stepMap.replaceInt('progress', parseInt(step.attr().progress));
-  //   stepMap.replaceInt('enemy_damage', parseInt(step.attr().enemy_damage));
-  //   stepMap.replaceInt('tips_read_list', parseInt(step.attr().tips_read_list));
-  //   stepMap.replaceInt('sp_level', parseInt(step.attr().sp_level));
-  //   stepMap.replaceInt('dp_level', parseInt(step.attr().dp_level));
-  //   stepMap.replaceInt('sp_mplay', parseInt(step.attr().sp_mplay));
-  //   stepMap.replaceInt('dp_mplay', parseInt(step.attr().dp_mplay));
-  //   stepMap.replaceInt(
-  //     'sp_mission_point',
-  //     parseInt(step.attr().sp_mission_point)
-  //   );
-  //   stepMap.replaceInt(
-  //     'dp_mission_point',
-  //     parseInt(step.attr().dp_mission_point)
-  //   );
-  //   stepMap.replaceInt(
-  //     'sp_dj_mission_level',
-  //     parseInt(step.attr().sp_dj_mission_level)
-  //   );
-  //   stepMap.replaceInt(
-  //     'dp_dj_mission_level',
-  //     parseInt(step.attr().dp_dj_mission_level)
-  //   );
-  //   stepMap.replaceInt(
-  //     'sp_dj_mission_clear',
-  //     parseInt(step.attr().sp_dj_mission_clear)
-  //   );
-  //   stepMap.replaceInt(
-  //     'dp_dj_mission_clear',
-  //     parseInt(step.attr().dp_dj_mission_clear)
-  //   );
-  //   stepMap.replaceInt(
-  //     'sp_clear_mission_level',
-  //     step.attr().sp_clear_mission_level
-  //   );
-  //   stepMap.replaceInt(
-  //     'dp_clear_mission_level',
-  //     step.attr().dp_clear_mission_level
-  //   );
-  //   stepMap.replaceInt(
-  //     'sp_clear_mission_clear',
-  //     step.attr().sp_clear_mission_clear
-  //   );
-  //   stepMap.replaceInt(
-  //     'dp_clear_mission_clear',
-  //     step.attr().dp_clear_mission_clear
-  //   );
-  //   stepMap.replaceBool('is_track_ticket', step.bool('is_track_ticket'));
-  //   newProfile.replaceMap('step', stepMap);
-  // }
-
-  console.dir(newProfile, { depth: null });
-
   return newProfile;
+};
+
+export const makeScoreStruct = (
+  scores: Score[],
+  cltype: number,
+  index: number
+) => {
+  const scorestruct = {};
+
+  for (const score of scores) {
+    const musicId = score.id;
+    const chart = score.chartId;
+
+    let chartIndex;
+    if (cltype === CLTYPE.SINGLE) {
+      if (
+        ![
+          ChartType.B7,
+          ChartType.N7,
+          ChartType.H7,
+          ChartType.A7,
+          ChartType.L7,
+        ].includes(chart)
+      )
+        continue;
+
+      chartIndex = {
+        [ChartType.B7]: 0,
+        [ChartType.N7]: 1,
+        [ChartType.H7]: 2,
+        [ChartType.A7]: 3,
+        [ChartType.L7]: 4,
+      }[chart];
+    }
+    if (cltype === CLTYPE.DOUBLE) {
+      if (
+        ![ChartType.N14, ChartType.H14, ChartType.A14, ChartType.L14].includes(
+          chart
+        )
+      )
+        continue;
+
+      chartIndex = {
+        [ChartType.N14]: 1,
+        [ChartType.H14]: 2,
+        [ChartType.A14]: 3,
+        [ChartType.L14]: 4,
+      }[chart];
+    }
+
+    if (scorestruct[musicId] == null) {
+      scorestruct[musicId] = [
+        index, // -1 is me, 0, 1, 2, 3, 4 ... is rival
+        musicId, // music id
+        0, // beginner clear flag
+        0, // normal clear flag
+        0, // hyper clear flag
+        0, // another clear flag
+        0, // leggendaria clear flag
+        0, // beginner ex score
+        0, // normal ex score
+        0, // hyper ex score
+        0, // another ex score
+        0, // leggendaria clear flag
+        -1, // beginner miss count
+        -1, // normal miss count
+        -1, // hyper miss count
+        -1, // another miss count
+        -1, // leggendaria miss count
+      ];
+    }
+
+    scorestruct[musicId][chartIndex + 1] = dbToGameClearStatus(
+      Version.CASTHOUR,
+      score.data.getInt('clear_status')
+    );
+    scorestruct[musicId][chartIndex + 6] = score.score;
+    scorestruct[musicId][chartIndex + 11] = score.data.getInt('miss_count', -1);
+  }
+
+  return Object.keys(scorestruct).map(v => scorestruct[v]);
 };

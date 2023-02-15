@@ -28,6 +28,7 @@ export const register = () => {
   GameRoute('pc.logout', true);
 
   GameRoute('music.getrank', music.getrank);
+  GameRoute('music.reg', music.reg);
 
   R.Unhandled((req, data, send) => {
     console.log(U.toXML({ [req.module]: data }));

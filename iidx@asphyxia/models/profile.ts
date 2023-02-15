@@ -65,6 +65,7 @@ export const putProfile = async (
   if (extId == null) return;
 
   const oldProfile = await getProfile(version, undefined, extId);
+  if (oldProfile == null) return;
   const template = await templatesFromVersion(version);
   const newProfile = template.unformatProfile(data, oldProfile);
   if (newProfile != null) {

@@ -1,3 +1,5 @@
+import { ChartType, ClearStatus } from '../models/score';
+
 export enum CLTYPE {
   SINGLE,
   DOUBLE,
@@ -63,4 +65,51 @@ export const versionFromModel = (model: string) => {
     return Version.CASTHOUR;
   }
   return null;
+};
+
+export const gameToDBChartType = (version: number, chartType: number) => {
+  if (version === Version.CASTHOUR) {
+    return {
+      8: ChartType.B7,
+      0: ChartType.N7,
+      1: ChartType.H7,
+      2: ChartType.A7,
+      3: ChartType.L7,
+      9: ChartType.B14,
+      4: ChartType.N14,
+      5: ChartType.H14,
+      6: ChartType.A14,
+      7: ChartType.L14,
+    }[chartType];
+  }
+};
+
+export const gameToDBClearStatus = (version: number, clearStatus: number) => {
+  if (version === Version.CASTHOUR) {
+    return {
+      0: ClearStatus.NO_PLAY,
+      1: ClearStatus.FAILED,
+      2: ClearStatus.ASSIST_CLEAR,
+      3: ClearStatus.EASY_CLEAR,
+      4: ClearStatus.CLEAR,
+      5: ClearStatus.HARD_CLEAR,
+      6: ClearStatus.EX_HARD_CLEAR,
+      7: ClearStatus.FULL_COMBO,
+    }[clearStatus];
+  }
+};
+
+export const dbToGameClearStatus = (version: number, clearStatus: number) => {
+  if (version === Version.CASTHOUR) {
+    return {
+      [ClearStatus.NO_PLAY]: 0,
+      [ClearStatus.FAILED]: 1,
+      [ClearStatus.ASSIST_CLEAR]: 2,
+      [ClearStatus.EASY_CLEAR]: 3,
+      [ClearStatus.CLEAR]: 4,
+      [ClearStatus.HARD_CLEAR]: 5,
+      [ClearStatus.EX_HARD_CLEAR]: 6,
+      [ClearStatus.FULL_COMBO]: 7,
+    }[clearStatus];
+  }
 };
