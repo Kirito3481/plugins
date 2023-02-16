@@ -110,6 +110,21 @@ export const getScores = async (
   return scores;
 };
 
+export const getClearRates = async (musicId?: number, chartId?: number) => {
+  const allHistorys = await DB.Find<ScoreHistory>(null, {
+    collection: 'score_history',
+    musicId,
+    chartId,
+  });
+
+  console.dir(allHistorys);
+  // const historys = {};
+
+  // for (const history of allHistorys) {
+  //   if (history.data.getInt(""))
+  // }
+};
+
 export const updateScore = async (
   extId: number,
   musicId: number,
@@ -125,7 +140,7 @@ export const updateScore = async (
       collection: 'profile',
       extId,
     })
-  ).__refid;
+  )?.__refid;
   let exScore = 2 * pgreats + greats;
 
   let oldScore: ScoreDoc | null;
@@ -138,7 +153,7 @@ export const updateScore = async (
       chartId,
     });
   } else {
-    if (ghost == null) throw new Error('No ghost for score save!');
+    if (ghost != null) throw new Error('Expected no ghost for score save!');
     oldScore = null;
   }
 

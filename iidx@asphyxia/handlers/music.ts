@@ -1,5 +1,5 @@
 import { ProfileDoc } from '../models/profile';
-import { getScores, updateScore } from '../models/score';
+import { getClearRates, getScores, updateScore } from '../models/score';
 import {
   gameToDBChartType,
   gameToDBClearStatus,
@@ -41,6 +41,45 @@ export const getrank: EamusePluginRoute = async (req, data, send) => {
     style: K.ATTR({ type: String(cltype) }),
     m,
   });
+};
+
+export const play: EamusePluginRoute = async (req, data, send) => {
+  console.log(
+    U.toXML({ call: K.ATTR({ model: req.model }, { [req.module]: data }) })
+  );
+
+  const version = versionFromModel(req.model);
+  if (version == null) return send.status(Status.NOT_ALLOWED);
+
+  const musicId = parseInt($(data).attr().mid);
+  const chartId = gameToDBChartType(version, parseInt($(data).attr().clid));
+  const clearStatus = gameToDBClearStatus(
+    version,
+    parseInt($(data).attr().cflg)
+  );
+
+  // await updateScore(
+  //   undefined,
+  //   musicId,
+  //   chartId,
+  //   clearStatus,
+  //   0,
+  //   0,
+  //   0,
+  //   undefined
+  // );
+
+  const historys = await getClearRates(musicId, chartId);
+  console.dir(historys);
+
+  return send.object(
+    K.ATTR({
+      mid: String(musicId),
+      clid: $(data).attr().clid,
+      crate: String(0),
+      frate: String(0),
+    })
+  );
 };
 
 export const reg: EamusePluginRoute = async (req, data, send) => {

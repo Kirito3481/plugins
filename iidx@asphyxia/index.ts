@@ -1,6 +1,7 @@
 import * as common from './handlers/common';
 import * as pc from './handlers/pc';
 import * as music from './handlers/music';
+import * as grade from './handlers/grade';
 
 export const register = () => {
   R.GameCode('LDJ');
@@ -28,7 +29,10 @@ export const register = () => {
   GameRoute('pc.logout', true);
 
   GameRoute('music.getrank', music.getrank);
+  GameRoute('music.play', music.play);
   GameRoute('music.reg', music.reg);
+
+  GameRoute('grade.raised', grade.raised);
 
   R.Unhandled((req, data, send) => {
     console.log(U.toXML({ [req.module]: data }));
